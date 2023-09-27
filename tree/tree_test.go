@@ -11,18 +11,18 @@ import (
 
 func TestRoot(t *testing.T) {
 
-	node1 := &node[int]{primary: 1}
+	node1 := &node[uint, int]{primary: 1}
 
 	var tests = map[string]struct {
-		tree *Tree[int]
-		exp  Node[int]
+		tree *Tree[uint, int]
+		exp  Node[uint, int]
 	}{
 		"nil root": {
-			tree: Empty[int](),
+			tree: Empty[uint, int](),
 			exp:  nil,
 		},
 		"non-nil root": {
-			tree: &Tree[int]{
+			tree: &Tree[uint, int]{
 				root: node1,
 			},
 			exp: node1,
@@ -45,59 +45,59 @@ type addInput struct {
 func TestAdd(t *testing.T) {
 
 	var tests = map[string]struct {
-		prep      func() *Tree[int]
+		prep      func() *Tree[uint, int]
 		add       addInput
 		expAdded  bool
 		expExists bool
 	}{
 		"primary exists": {
-			prep: func() *Tree[int] {
-				n := &node[int]{primary: 1}
-				return &Tree[int]{root: n, primary: &index[int]{1: n}}
+			prep: func() *Tree[uint, int] {
+				n := &node[uint, int]{primary: 1}
+				return &Tree[uint, int]{root: n, primary: &index[uint, int]{1: n}}
 			},
 			add:       addInput{1, 0},
 			expAdded:  false,
 			expExists: true,
 		},
 		"root is nil": {
-			prep: func() *Tree[int] {
-				return &Tree[int]{primary: &index[int]{}}
+			prep: func() *Tree[uint, int] {
+				return &Tree[uint, int]{primary: &index[uint, int]{}}
 			},
 			add:       addInput{1, 0},
 			expAdded:  true,
 			expExists: false,
 		},
 		"re-root": {
-			prep: func() *Tree[int] {
-				n := &node[int]{primary: 1, parentID: 2}
-				return &Tree[int]{root: n, primary: &index[int]{1: n}}
+			prep: func() *Tree[uint, int] {
+				n := &node[uint, int]{primary: 1, parentID: 2}
+				return &Tree[uint, int]{root: n, primary: &index[uint, int]{1: n}}
 			},
 			add:       addInput{2, 3},
 			expAdded:  true,
 			expExists: false,
 		},
 		"re-root with cycle": {
-			prep: func() *Tree[int] {
-				n := &node[int]{primary: 1, parentID: 2}
-				return &Tree[int]{root: n, primary: &index[int]{1: n}}
+			prep: func() *Tree[uint, int] {
+				n := &node[uint, int]{primary: 1, parentID: 2}
+				return &Tree[uint, int]{root: n, primary: &index[uint, int]{1: n}}
 			},
 			add:       addInput{2, 1},
 			expAdded:  false,
 			expExists: false,
 		},
 		"parent does not exist": {
-			prep: func() *Tree[int] {
-				n := &node[int]{primary: 1}
-				return &Tree[int]{root: n, primary: &index[int]{1: n}}
+			prep: func() *Tree[uint, int] {
+				n := &node[uint, int]{primary: 1}
+				return &Tree[uint, int]{root: n, primary: &index[uint, int]{1: n}}
 			},
 			add:       addInput{2, 3},
 			expAdded:  false,
 			expExists: false,
 		},
 		"added": {
-			prep: func() *Tree[int] {
-				n := &node[int]{primary: 1}
-				return &Tree[int]{root: n, primary: &index[int]{1: n}}
+			prep: func() *Tree[uint, int] {
+				n := &node[uint, int]{primary: 1}
+				return &Tree[uint, int]{root: n, primary: &index[uint, int]{1: n}}
 			},
 			add:       addInput{2, 1},
 			expAdded:  true,
@@ -167,12 +167,12 @@ func TestAddResults(t *testing.T) {
 
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			tree := Empty[int]()
+			tree := Empty[uint, int]()
 			for _, input := range tt.adds {
 				tree.Add(input.nodeID, input.parentID, 0)
 			}
 
-			assert.Equal(t, tt.expBFC, bfc([]Node[int]{tree.root}, []uint{}))
+			assert.Equal(t, tt.expBFC, bfc([]Node[uint, int]{tree.root}, []uint{}))
 			assert.Equal(t, tt.expDFC, dfc(tree.root, []uint{}))
 
 			for _, key := range tt.expBFC {
@@ -189,15 +189,15 @@ func TestAddResults(t *testing.T) {
 func TestFind(t *testing.T) {
 
 	var tests = map[string]struct {
-		prep      func() *Tree[string]
+		prep      func() *Tree[uint, string]
 		argID     uint
 		expNodeID uint
 		expOK     bool
 	}{
 		"primary does not exist": {
-			prep: func() *Tree[string] {
-				n := &node[string]{primary: 1}
-				t := &Tree[string]{root: n, primary: &index[string]{1: n}}
+			prep: func() *Tree[uint, string] {
+				n := &node[uint, string]{primary: 1}
+				t := &Tree[uint, string]{root: n, primary: &index[uint, string]{1: n}}
 				t.Add(2, 1, "")
 				return t
 			},
@@ -206,9 +206,9 @@ func TestFind(t *testing.T) {
 			expOK:     false,
 		},
 		"primary exists - branch end": {
-			prep: func() *Tree[string] {
-				n := &node[string]{primary: 1}
-				t := &Tree[string]{root: n, primary: &index[string]{1: n}}
+			prep: func() *Tree[uint, string] {
+				n := &node[uint, string]{primary: 1}
+				t := &Tree[uint, string]{root: n, primary: &index[uint, string]{1: n}}
 				t.Add(2, 1, "")
 				t.Add(3, 2, "")
 				t.Add(4, 1, "")
@@ -219,9 +219,9 @@ func TestFind(t *testing.T) {
 			expOK:     true,
 		},
 		"primary exists - mid tree": {
-			prep: func() *Tree[string] {
-				n := &node[string]{primary: 1}
-				t := &Tree[string]{root: n, primary: &index[string]{1: n}}
+			prep: func() *Tree[uint, string] {
+				n := &node[uint, string]{primary: 1}
+				t := &Tree[uint, string]{root: n, primary: &index[uint, string]{1: n}}
 				t.Add(2, 1, "")
 				t.Add(3, 2, "")
 				t.Add(4, 1, "")
@@ -232,9 +232,9 @@ func TestFind(t *testing.T) {
 			expOK:     true,
 		},
 		"primary exists - root": {
-			prep: func() *Tree[string] {
-				n := &node[string]{primary: 1}
-				t := &Tree[string]{root: n, primary: &index[string]{1: n}}
+			prep: func() *Tree[uint, string] {
+				n := &node[uint, string]{primary: 1}
+				t := &Tree[uint, string]{root: n, primary: &index[uint, string]{1: n}}
 				t.Add(2, 1, "")
 				t.Add(3, 2, "")
 				t.Add(4, 1, "")
@@ -265,15 +265,15 @@ func TestFind(t *testing.T) {
 func TestFindParents(t *testing.T) {
 
 	var tests = map[string]struct {
-		prep       func() *Tree[string]
+		prep       func() *Tree[uint, string]
 		argID      uint
 		expNodeIDs []uint
 		expOK      bool
 	}{
 		"primary does not exist": {
-			prep: func() *Tree[string] {
-				n := &node[string]{primary: 1}
-				t := &Tree[string]{root: n, primary: &index[string]{1: n}}
+			prep: func() *Tree[uint, string] {
+				n := &node[uint, string]{primary: 1}
+				t := &Tree[uint, string]{root: n, primary: &index[uint, string]{1: n}}
 				t.Add(2, 1, "")
 				return t
 			},
@@ -282,9 +282,9 @@ func TestFindParents(t *testing.T) {
 			expOK:      false,
 		},
 		"primary exists - branch end": {
-			prep: func() *Tree[string] {
-				n := &node[string]{primary: 1}
-				t := &Tree[string]{root: n, primary: &index[string]{1: n}}
+			prep: func() *Tree[uint, string] {
+				n := &node[uint, string]{primary: 1}
+				t := &Tree[uint, string]{root: n, primary: &index[uint, string]{1: n}}
 				t.Add(2, 1, "")
 				t.Add(3, 2, "")
 				t.Add(4, 1, "")
@@ -295,9 +295,9 @@ func TestFindParents(t *testing.T) {
 			expOK:      true,
 		},
 		"primary exists - mid tree": {
-			prep: func() *Tree[string] {
-				n := &node[string]{primary: 1}
-				t := &Tree[string]{root: n, primary: &index[string]{1: n}}
+			prep: func() *Tree[uint, string] {
+				n := &node[uint, string]{primary: 1}
+				t := &Tree[uint, string]{root: n, primary: &index[uint, string]{1: n}}
 				t.Add(2, 1, "")
 				t.Add(3, 2, "")
 				t.Add(4, 1, "")
@@ -308,9 +308,9 @@ func TestFindParents(t *testing.T) {
 			expOK:      true,
 		},
 		"primary exists - root": {
-			prep: func() *Tree[string] {
-				n := &node[string]{primary: 1}
-				t := &Tree[string]{root: n, primary: &index[string]{1: n}}
+			prep: func() *Tree[uint, string] {
+				n := &node[uint, string]{primary: 1}
+				t := &Tree[uint, string]{root: n, primary: &index[uint, string]{1: n}}
 				t.Add(2, 1, "")
 				t.Add(3, 2, "")
 				t.Add(4, 1, "")
@@ -343,22 +343,22 @@ func TestFindParents(t *testing.T) {
 func TestMerge(t *testing.T) {
 
 	var tests = map[string]struct {
-		prepRoot  func() *Tree[string]
-		prepOther func() *Tree[string]
+		prepRoot  func() *Tree[uint, string]
+		prepOther func() *Tree[uint, string]
 		expOK     bool
 		expBFC    []uint
 		expDFC    []uint
 	}{
 		"other parent not in tree": {
-			prepRoot: func() *Tree[string] {
-				n := &node[string]{primary: 1}
-				t := &Tree[string]{root: n, primary: &index[string]{1: n}}
+			prepRoot: func() *Tree[uint, string] {
+				n := &node[uint, string]{primary: 1}
+				t := &Tree[uint, string]{root: n, primary: &index[uint, string]{1: n}}
 				t.Add(2, 1, "")
 				return t
 			},
-			prepOther: func() *Tree[string] {
-				n := &node[string]{primary: 3}
-				t := &Tree[string]{root: n, primary: &index[string]{3: n}}
+			prepOther: func() *Tree[uint, string] {
+				n := &node[uint, string]{primary: 3}
+				t := &Tree[uint, string]{root: n, primary: &index[uint, string]{3: n}}
 				t.Add(4, 3, "")
 				return t
 			},
@@ -367,14 +367,14 @@ func TestMerge(t *testing.T) {
 			expDFC: []uint{1, 2},
 		},
 		"dulicate keys": {
-			prepRoot: func() *Tree[string] {
-				n := &node[string]{primary: 1}
-				t := &Tree[string]{root: n, primary: &index[string]{1: n}}
+			prepRoot: func() *Tree[uint, string] {
+				n := &node[uint, string]{primary: 1}
+				t := &Tree[uint, string]{root: n, primary: &index[uint, string]{1: n}}
 				t.Add(2, 1, "")
 				return t
 			},
-			prepOther: func() *Tree[string] {
-				t := Empty[string]()
+			prepOther: func() *Tree[uint, string] {
+				t := Empty[uint, string]()
 				t.Add(3, 1, "")
 				t.Add(2, 3, "")
 				return t
@@ -384,17 +384,17 @@ func TestMerge(t *testing.T) {
 			expDFC: []uint{1, 2},
 		},
 		"merged - branch end": {
-			prepRoot: func() *Tree[string] {
-				n := &node[string]{primary: 1}
-				t := &Tree[string]{root: n, primary: &index[string]{1: n}}
+			prepRoot: func() *Tree[uint, string] {
+				n := &node[uint, string]{primary: 1}
+				t := &Tree[uint, string]{root: n, primary: &index[uint, string]{1: n}}
 				t.Add(2, 1, "")
 				t.Add(3, 2, "")
 				t.Add(4, 2, "")
 				t.Add(5, 1, "")
 				return t
 			},
-			prepOther: func() *Tree[string] {
-				t := Empty[string]()
+			prepOther: func() *Tree[uint, string] {
+				t := Empty[uint, string]()
 				t.Add(6, 5, "")
 				t.Add(7, 6, "")
 				return t
@@ -404,17 +404,17 @@ func TestMerge(t *testing.T) {
 			expDFC: []uint{1, 2, 3, 4, 5, 6, 7},
 		},
 		"merged - mid tree": {
-			prepRoot: func() *Tree[string] {
-				n := &node[string]{primary: 1}
-				t := &Tree[string]{root: n, primary: &index[string]{1: n}}
+			prepRoot: func() *Tree[uint, string] {
+				n := &node[uint, string]{primary: 1}
+				t := &Tree[uint, string]{root: n, primary: &index[uint, string]{1: n}}
 				t.Add(2, 1, "")
 				t.Add(3, 2, "")
 				t.Add(4, 2, "")
 				t.Add(5, 1, "")
 				return t
 			},
-			prepOther: func() *Tree[string] {
-				t := Empty[string]()
+			prepOther: func() *Tree[uint, string] {
+				t := Empty[uint, string]()
 				t.Add(6, 1, "")
 				t.Add(7, 6, "")
 				return t
@@ -433,7 +433,7 @@ func TestMerge(t *testing.T) {
 
 			assert.Equal(t, tt.expOK, gotOK)
 
-			assert.Equal(t, tt.expBFC, bfc([]Node[string]{tree.root}, []uint{}))
+			assert.Equal(t, tt.expBFC, bfc([]Node[uint, string]{tree.root}, []uint{}))
 			assert.Equal(t, tt.expDFC, dfc(tree.root, []uint{}))
 
 			for _, key := range tt.expBFC {
@@ -463,19 +463,19 @@ func TestSerialize(t *testing.T) {
 	}
 
 	var tests = map[string]struct {
-		prep      func() *Tree[any]
+		prep      func() *Tree[uint, any]
 		traversal TraversalType
 		expCount  int
 		expErr    error
 	}{
 		"empty": {
-			prep:      Empty[any],
+			prep:      Empty[uint, any],
 			traversal: TraverseBreadthFirst,
 		},
 		"breadth-first": {
-			prep: func() *Tree[any] {
+			prep: func() *Tree[uint, any] {
 
-				t := Empty[any]()
+				t := Empty[uint, any]()
 				t.Add(1, 0, Serializable{"valuable data", []int{1, 2, 3, 4, 5, 6, 7, 8}})
 				t.Add(2, 1, map[string]string{"us": "good", "them": "bad"})
 				es := embeddedSerializable{
@@ -491,9 +491,9 @@ func TestSerialize(t *testing.T) {
 			expCount:  5,
 		},
 		// "cannot serialize": {
-		// 	prep: func() *Tree[any] {
+		// 	prep: func() *Tree[uint, any] {
 
-		// 		t := Empty[any]()
+		// 		t := Empty[uint, any]()
 		// 		t.Add(2, 1, CannotSerialize{})
 		// 		return t
 		// 	},
@@ -558,22 +558,22 @@ func TestDeserializeMap(t *testing.T) {
 	type elem map[string][]int
 
 	var tests = map[string]struct {
-		prep       func() *Tree[elem]
+		prep       func() *Tree[uint, elem]
 		traversal  TraversalType
 		expErr     error
 		expBFC     []uint
 		expDFC     []uint
-		dataAssert func(*testing.T, *Tree[elem])
+		dataAssert func(*testing.T, *Tree[uint, elem])
 	}{
 		"empty": {
-			prep:      Empty[elem],
+			prep:      Empty[uint, elem],
 			traversal: TraverseBreadthFirst,
 			expBFC:    []uint{},
 			expDFC:    []uint{},
 		},
 		"serialize breadth first": {
-			prep: func() *Tree[elem] {
-				t := Empty[elem]()
+			prep: func() *Tree[uint, elem] {
+				t := Empty[uint, elem]()
 				t.Add(1, 0, elem{"one": {1, 2}, "two": {2}})
 				t.Add(2, 1, elem{"two": {2}})
 				t.Add(3, 2, elem{"three": {3}})
@@ -585,7 +585,7 @@ func TestDeserializeMap(t *testing.T) {
 			expErr:    nil,
 			expBFC:    []uint{1, 2, 4, 3, 5},
 			expDFC:    []uint{1, 2, 3, 4, 5},
-			dataAssert: func(t *testing.T, gotTree *Tree[elem]) {
+			dataAssert: func(t *testing.T, gotTree *Tree[uint, elem]) {
 				iter := gotTree.Traverse(TraverseBreadthFirst)
 				expData := []elem{
 					{"one": {1, 2}, "two": {2}},
@@ -611,7 +611,7 @@ func TestDeserializeMap(t *testing.T) {
 
 			//t.Logf("Started to serialize")
 
-			gotTree, gotErr := Deserialize[elem](rdr)
+			gotTree, gotErr := Deserialize[uint, elem](rdr)
 
 			//t.Logf("Finished deserializing")
 
@@ -621,7 +621,7 @@ func TestDeserializeMap(t *testing.T) {
 
 			// only check the tree value if both expected and got errors are nil
 			if gotErr == nil && tt.expErr == nil {
-				assert.Equal(t, tt.expBFC, bfc([]Node[elem]{gotTree.root}, []uint{}))
+				assert.Equal(t, tt.expBFC, bfc([]Node[uint, elem]{gotTree.root}, []uint{}))
 				assert.Equal(t, tt.expDFC, dfc(gotTree.root, []uint{}))
 
 				if tt.dataAssert != nil {
@@ -656,21 +656,21 @@ func TestDeserializeStruct(t *testing.T) {
 	}
 
 	var tests = map[string]struct {
-		prep       func() *Tree[embeddedSerializable]
+		prep       func() *Tree[uint, embeddedSerializable]
 		expErr     error
 		expBFC     []uint
-		dataAssert func(*testing.T, *Tree[embeddedSerializable])
+		dataAssert func(*testing.T, *Tree[uint, embeddedSerializable])
 	}{
 		"struct": {
-			prep: func() *Tree[embeddedSerializable] {
+			prep: func() *Tree[uint, embeddedSerializable] {
 
-				t := Empty[embeddedSerializable]()
+				t := Empty[uint, embeddedSerializable]()
 				t.Add(1, 0, embedData1)
 				t.Add(2, 1, embedData2)
 				return t
 			},
 			expBFC: []uint{1, 2},
-			dataAssert: func(t *testing.T, gotTree *Tree[embeddedSerializable]) {
+			dataAssert: func(t *testing.T, gotTree *Tree[uint, embeddedSerializable]) {
 				iter := gotTree.Traverse(TraverseBreadthFirst)
 				expData := []embeddedSerializable{embedData1, embedData2}
 				gotData := []embeddedSerializable{}
@@ -690,13 +690,13 @@ func TestDeserializeStruct(t *testing.T) {
 			// this test assumes that Serialize will throw no errors
 			rdr, _ := prepTree.Serialize(TraverseBreadthFirst)
 
-			gotTree, gotErr := Deserialize[embeddedSerializable](rdr)
+			gotTree, gotErr := Deserialize[uint, embeddedSerializable](rdr)
 
 			assert.Equal(t, tt.expErr, gotErr)
 
 			// only check the tree value if both expected and got errors are nil
 			if gotErr == nil && tt.expErr == nil {
-				assert.Equal(t, tt.expBFC, bfc([]Node[embeddedSerializable]{gotTree.root}, []uint{}))
+				assert.Equal(t, tt.expBFC, bfc([]Node[uint, embeddedSerializable]{gotTree.root}, []uint{}))
 
 				if tt.dataAssert != nil {
 					tt.dataAssert(t, gotTree)

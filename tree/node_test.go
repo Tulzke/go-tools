@@ -9,11 +9,11 @@ import (
 func TestGetID(t *testing.T) {
 
 	tests := map[string]struct {
-		n     Node[int]
+		n     Node[uint, int]
 		expID uint
 	}{
 		"trivial": {
-			n:     &node[int]{primary: 1},
+			n:     &node[uint, int]{primary: 1},
 			expID: 1,
 		},
 	}
@@ -30,11 +30,11 @@ func TestGetID(t *testing.T) {
 func TestGetParentID(t *testing.T) {
 
 	tests := map[string]struct {
-		n   Node[int]
+		n   Node[uint, int]
 		exp uint
 	}{
 		"trivial": {
-			n:   &node[int]{parentID: 1},
+			n:   &node[uint, int]{parentID: 1},
 			exp: 1,
 		},
 	}
@@ -50,24 +50,24 @@ func TestGetParentID(t *testing.T) {
 
 func TestGetChildren(t *testing.T) {
 
-	node1 := &node[int]{primary: 1}
-	node2 := &node[int]{primary: 2}
+	node1 := &node[uint, int]{primary: 1}
+	node2 := &node[uint, int]{primary: 2}
 
 	tests := map[string]struct {
-		n        Node[int]
-		expChild []Node[int]
+		n        Node[uint, int]
+		expChild []Node[uint, int]
 	}{
 		"nil child array": {
-			n:        &node[int]{},
+			n:        &node[uint, int]{},
 			expChild: nil,
 		},
 		"empty child array": {
-			n:        &node[int]{children: []Node[int]{}},
-			expChild: []Node[int]{},
+			n:        &node[uint, int]{children: []Node[uint, int]{}},
+			expChild: []Node[uint, int]{},
 		},
 		"success": {
-			n:        &node[int]{children: []Node[int]{node1, node2}},
-			expChild: []Node[int]{node1, node2},
+			n:        &node[uint, int]{children: []Node[uint, int]{node1, node2}},
+			expChild: []Node[uint, int]{node1, node2},
 		},
 	}
 
@@ -82,18 +82,18 @@ func TestGetChildren(t *testing.T) {
 
 func TestGetParent(t *testing.T) {
 
-	node1 := &node[int]{primary: 1}
+	node1 := &node[uint, int]{primary: 1}
 
 	tests := map[string]struct {
-		n       Node[int]
-		expNode Node[int]
+		n       Node[uint, int]
+		expNode Node[uint, int]
 	}{
 		"nil parent": {
-			n:       &node[int]{},
+			n:       &node[uint, int]{},
 			expNode: nil,
 		},
 		"success": {
-			n:       &node[int]{parent: node1},
+			n:       &node[uint, int]{parent: node1},
 			expNode: node1,
 		},
 	}
@@ -109,39 +109,39 @@ func TestGetParent(t *testing.T) {
 
 func TestNodeAddChildren(t *testing.T) {
 
-	node1 := &node[int]{primary: 1}
-	node2 := &node[int]{primary: 2}
-	node3 := &node[int]{primary: 3}
+	node1 := &node[uint, int]{primary: 1}
+	node2 := &node[uint, int]{primary: 2}
+	node3 := &node[uint, int]{primary: 3}
 
 	tests := map[string]struct {
-		n        Node[int]
-		argNodes []Node[int]
-		expChild []Node[int]
+		n        Node[uint, int]
+		argNodes []Node[uint, int]
+		expChild []Node[uint, int]
 	}{
 		"nil child array": {
-			n:        &node[int]{},
-			argNodes: []Node[int]{node1},
-			expChild: []Node[int]{node1},
+			n:        &node[uint, int]{},
+			argNodes: []Node[uint, int]{node1},
+			expChild: []Node[uint, int]{node1},
 		},
 		"empty child array": {
-			n:        &node[int]{children: []Node[int]{}},
-			argNodes: []Node[int]{node1},
-			expChild: []Node[int]{node1},
+			n:        &node[uint, int]{children: []Node[uint, int]{}},
+			argNodes: []Node[uint, int]{node1},
+			expChild: []Node[uint, int]{node1},
 		},
 		"add nil": {
-			n:        &node[int]{children: []Node[int]{node1}},
+			n:        &node[uint, int]{children: []Node[uint, int]{node1}},
 			argNodes: nil,
-			expChild: []Node[int]{node1},
+			expChild: []Node[uint, int]{node1},
 		},
 		"add empty array": {
-			n:        &node[int]{children: []Node[int]{node1}},
-			argNodes: []Node[int]{},
-			expChild: []Node[int]{node1},
+			n:        &node[uint, int]{children: []Node[uint, int]{node1}},
+			argNodes: []Node[uint, int]{},
+			expChild: []Node[uint, int]{node1},
 		},
 		"non-empty child array": {
-			n:        &node[int]{children: []Node[int]{node1}},
-			argNodes: []Node[int]{node2, node3},
-			expChild: []Node[int]{node1, node2, node3},
+			n:        &node[uint, int]{children: []Node[uint, int]{node1}},
+			argNodes: []Node[uint, int]{node2, node3},
+			expChild: []Node[uint, int]{node1, node2, node3},
 		},
 	}
 
@@ -156,39 +156,39 @@ func TestNodeAddChildren(t *testing.T) {
 
 func TestReplaceChildren(t *testing.T) {
 
-	node1 := &node[int]{primary: 1}
-	node2 := &node[int]{primary: 2}
-	node3 := &node[int]{primary: 3}
+	node1 := &node[uint, int]{primary: 1}
+	node2 := &node[uint, int]{primary: 2}
+	node3 := &node[uint, int]{primary: 3}
 
 	tests := map[string]struct {
-		n        Node[int]
-		argNodes []Node[int]
-		expChild []Node[int]
+		n        Node[uint, int]
+		argNodes []Node[uint, int]
+		expChild []Node[uint, int]
 	}{
 		"nil child array": {
-			n:        &node[int]{},
-			argNodes: []Node[int]{node1},
-			expChild: []Node[int]{node1},
+			n:        &node[uint, int]{},
+			argNodes: []Node[uint, int]{node1},
+			expChild: []Node[uint, int]{node1},
 		},
 		"empty child array": {
-			n:        &node[int]{children: []Node[int]{}},
-			argNodes: []Node[int]{node1},
-			expChild: []Node[int]{node1},
+			n:        &node[uint, int]{children: []Node[uint, int]{}},
+			argNodes: []Node[uint, int]{node1},
+			expChild: []Node[uint, int]{node1},
 		},
 		"use nil": {
-			n:        &node[int]{children: []Node[int]{node1}},
+			n:        &node[uint, int]{children: []Node[uint, int]{node1}},
 			argNodes: nil,
-			expChild: []Node[int]{},
+			expChild: []Node[uint, int]{},
 		},
 		"use empty array": {
-			n:        &node[int]{children: []Node[int]{node1}},
-			argNodes: []Node[int]{},
-			expChild: []Node[int]{},
+			n:        &node[uint, int]{children: []Node[uint, int]{node1}},
+			argNodes: []Node[uint, int]{},
+			expChild: []Node[uint, int]{},
 		},
 		"non-empty replacement array": {
-			n:        &node[int]{children: []Node[int]{node1}},
-			argNodes: []Node[int]{node2, node3},
-			expChild: []Node[int]{node2, node3},
+			n:        &node[uint, int]{children: []Node[uint, int]{node1}},
+			argNodes: []Node[uint, int]{node2, node3},
+			expChild: []Node[uint, int]{node2, node3},
 		},
 	}
 
@@ -204,17 +204,17 @@ func TestReplaceChildren(t *testing.T) {
 
 func TestSetParent(t *testing.T) {
 
-	node1 := &node[int]{primary: 1}
-	node2 := &node[int]{primary: 2}
+	node1 := &node[uint, int]{primary: 1}
+	node2 := &node[uint, int]{primary: 2}
 
 	tests := map[string]struct {
-		n           Node[int]
-		argParent   Node[int]
-		expParent   Node[int]
+		n           Node[uint, int]
+		argParent   Node[uint, int]
+		expParent   Node[uint, int]
 		expParentID uint
 	}{
 		"set nil parent": {
-			n:           &node[int]{primary: 1},
+			n:           &node[uint, int]{primary: 1},
 			argParent:   nil,
 			expParent:   nil,
 			expParentID: 0,
@@ -226,7 +226,7 @@ func TestSetParent(t *testing.T) {
 			expParentID: 0,
 		},
 		"success": {
-			n:           &node[int]{primary: 1},
+			n:           &node[uint, int]{primary: 1},
 			argParent:   node2,
 			expParent:   node2,
 			expParentID: 2,

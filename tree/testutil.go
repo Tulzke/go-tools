@@ -5,9 +5,9 @@ package tree
 // in a tree in order of selected traversal.
 
 // returns the primary keys of a tree in order of a breadth first search
-func bfc[T any](q []Node[T], iter []uint) []uint {
+func bfc[K comparable, T any](q []Node[K, T], iter []K) []K {
 	if q == nil || len(q) == 0 || q[0] == nil {
-		return []uint{}
+		return []K{}
 	}
 	iter = append(iter, q[0].GetID())
 	q = append(q[1:], q[0].GetChildren()...)
@@ -18,9 +18,9 @@ func bfc[T any](q []Node[T], iter []uint) []uint {
 }
 
 // returns the primary keys of a tree in order of a breadth first search
-func dfc[T any](n Node[T], iter []uint) []uint {
+func dfc[K comparable, T any](n Node[K, T], iter []K) []K {
 	if n == nil {
-		return []uint{}
+		return []K{}
 	}
 	iter = append(iter, n.GetID())
 	for _, c := range n.GetChildren() {

@@ -31,24 +31,24 @@ import (
 // When this node is serialized, only the id and parent id, along with
 // associated data are serialized. The internal pointers to parent and children
 // are recreated with the nodes are deserialized.
-type Node[T any] interface {
+type Node[K comparable, T any] interface {
 	// GetID returns the primary key of this node.
-	GetID() uint
+	GetID() K
 	// GetParentID returns the primary key of this node's parent.
-	GetParentID() uint
+	GetParentID() K
 
 	// GetChildren returns an array of pointers to all children of this node.
-	GetChildren() []Node[T]
+	GetChildren() []Node[K, T]
 	// GetParent returns a pointer to the parent node of this node.
-	GetParent() Node[T]
+	GetParent() Node[K, T]
 
 	// AddChildren adds a list of Nodes as children of this node.
-	AddChildren(...Node[T])
+	AddChildren(...Node[K, T])
 	// ReplaceChildren replaces the current list of children with a new list of
 	// Nodes.
-	ReplaceChildren(...Node[T])
+	ReplaceChildren(...Node[K, T])
 
-	setParent(n Node[T])
+	setParent(n Node[K, T])
 
 	// GetData retruns this node's internal data.
 	GetData() T
@@ -61,43 +61,43 @@ type Node[T any] interface {
 	SetData(T)
 }
 
-type node[T any] struct {
-	primary  uint
-	parentID uint
-	parent   Node[T]
+type node[K comparable, T any] struct {
+	primary  K
+	parentID K
+	parent   Node[K, T]
 	data     T
-	children []Node[T]
+	children []Node[K, T]
 }
 
-func (n *node[T]) GetID() uint {
+func (n *node[K, T]) GetID() K {
 	return n.primary
 }
 
-func (n *node[T]) GetParentID() uint {
+func (n *node[K, T]) GetParentID() K {
 	return n.parentID
 }
 
-func (n *node[T]) GetChildren() []Node[T] {
+func (n *node[K, T]) GetChildren() []Node[K, T] {
 	return n.children
 }
 
-func (n *node[T]) GetParent() Node[T] {
+func (n *node[K, T]) GetParent() Node[K, T] {
 	return n.parent
 }
 
-func (n *node[T]) AddChildren(children ...Node[T]) {
+func (n *node[K, T]) AddChildren(children ...Node[K, T]) {
 	if n.children == nil {
-		n.children = []Node[T]{}
+		n.children = []Node[K, T]{}
 	}
 	n.children = append(n.children, children[:]...)
 }
 
-func (n *node[T]) ReplaceChildren(children ...Node[T]) {
-	n.children = []Node[T]{}
+func (n *node[K, T]) ReplaceChildren(children ...Node[K, T]) {
+	n.children = []Node[K, T]{}
 	n.AddChildren(children...)
 }
 
-func (n *node[T]) setParent(parent Node[T]) {
+func (n *node[K, T]) setParent(parent Node[K, T]) {
 	if parent == nil || parent.GetID() == n.GetID() {
 		return
 	}
@@ -106,23 +106,23 @@ func (n *node[T]) setParent(parent Node[T]) {
 
 }
 
-func (n *node[T]) GetData() T {
+func (n *node[K, T]) GetData() T {
 	return n.data
 }
 
-func (n *node[T]) SetData(newdata T) {
+func (n *node[K, T]) SetData(newdata T) {
 	n.data = newdata
 }
 
-func (n *node[T]) Format(f fmt.State, verb rune) {
+func (n *node[K, T]) Format(f fmt.State, verb rune) {
 	switch verb {
 	case 'v':
-		fmt.Fprintf(f, "{primary: %d parentID: %d data:%+v children:[", n.primary, n.parentID, n.data)
+		fmt.Fprintf(f, "{primary: %v parentID: %v data:%+v children:[", n.primary, n.parentID, n.data)
 		for i, n := range n.children {
 			if i != 0 {
 				fmt.Fprint(f, " ")
 			}
-			fmt.Fprintf(f, "%d", n.GetID())
+			fmt.Fprintf(f, "%v", n.GetID())
 		}
 		fmt.Fprint(f, "]}")
 	}
