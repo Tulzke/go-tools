@@ -8,13 +8,13 @@ import (
 
 func TestIndexFind(t *testing.T) {
 
-	node1 := &node[int]{primary: 1}
-	node2 := &node[int]{primary: 2}
+	node1 := &node[uint, int]{primary: 1}
+	node2 := &node[uint, int]{primary: 2}
 
 	tests := map[string]struct {
-		index   index[int]
+		index   index[uint, int]
 		argID   uint
-		expNode Node[int]
+		expNode Node[uint, int]
 	}{
 		"nil index": {
 			index:   nil,
@@ -22,7 +22,7 @@ func TestIndexFind(t *testing.T) {
 			expNode: nil,
 		},
 		"not in index": {
-			index: index[int]{
+			index: index[uint, int]{
 				1: node1,
 				2: node2,
 			},
@@ -30,7 +30,7 @@ func TestIndexFind(t *testing.T) {
 			expNode: nil,
 		},
 		"success": {
-			index: index[int]{
+			index: index[uint, int]{
 				1: node1,
 				2: node2,
 			},

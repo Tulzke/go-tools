@@ -30,8 +30,8 @@ const (
 // If a tree is modified after the traversal has begun, any node that is
 // added after its correct place in traversal order will not be visited, nor
 // will any of its children.
-func (t *Tree[T]) Traverse(trvsl TraversalType) <-chan Node[T] {
-	search := make(chan Node[T])
+func (t *Tree[K, T]) Traverse(trvsl TraversalType) <-chan Node[K, T] {
+	search := make(chan Node[K, T])
 
 	switch trvsl {
 	case TraverseBreadthFirst:
@@ -51,11 +51,11 @@ func (t *Tree[T]) Traverse(trvsl TraversalType) <-chan Node[T] {
 
 }
 
-func bfs[T any](q *queue.Queue, search chan<- Node[T]) bool {
+func bfs[K comparable, T any](q *queue.Queue, search chan<- Node[K, T]) bool {
 
 	current := q.PopFront()
 	switch c := current.(type) {
-	case Node[T]:
+	case Node[K, T]:
 		for _, c := range c.GetChildren() {
 			q.PushBack(c)
 		}
